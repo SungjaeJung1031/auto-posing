@@ -1,14 +1,18 @@
 var gClock;
 var gCamera, gControls, gRenderer;
 
-var gMixer, gSkeletonHelper;
+var gSkeletonHelper;
+var gMixer;
+var gClipActionMixer;
 
 var gScene;
 var gSceneKeyPoints;
 
+var gDatGUI;
+
 var gBVH;
 
-const gSphereGeometry = new THREE.SphereGeometry(1);
+const gSphereGeometry = new THREE.SphereGeometry(2);
 const gSphereMaterial = new THREE.MeshPhongMaterial({ color: 0xff0000, transparent: true });
 var gSpheres = [];
 
@@ -21,7 +25,7 @@ function loadBVH(){
 
         gBVH = bvh;
 
-        console.log(gSpheres);
+        console.log(bvh);
 
         for (var i = 0 ; i < gBVH.skeleton.bones.length; i++)
         {
@@ -39,21 +43,37 @@ function loadBVH(){
 
         // play animation
         gMixer = new THREE.AnimationMixer( gSkeletonHelper );
-        gMixer.clipAction( bvh.clip ).setEffectiveWeight( 1.0 ).play();
+        gClipActionMixer = gMixer.clipAction( bvh.clip );
+        gClipActionMixer.loop = THREE.LoopOnce;
+        const objPlay = {play : ()=>{ gClipActionMixer.isScheduled()? gClipActionMixer.reset() : gClipActionMixer.play() } };
+        gDatGUI.add(objPlay, 'play');
+        gDatGUI.add(gClipActionMixer, 'time', 0, 300, 0.05).listen();
+        gDatGUI.add(gClipActionMixer, 'timeScale', 0, 2, 0.05).listen();
+        gDatGUI.add(gClipActionMixer, 'clampWhenFinished');
+        window.action = gClipActionMixer;
+        //gMixer.clipAction( bvh.clip ).setEffectiveWeight( 1.0 ).play();
 
     } );
 }
 
 function init() {
+
+
+    gDatGUI = new dat.GUI();
     gClock = new THREE.Clock();
 
+
+    //////////////////////////////////////
+    // Scene
     gCamera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 1000 );
     gCamera.position.set( 0, 200, 400 );
 
     gScene = new THREE.Scene();
     gScene.name = "scene_global"
     gScene.background   = new THREE.Color(0xBAB9B9);
-    gScene.add( new THREE.GridHelper( 200, 10 ) );
+    const sizeGridHelper = 5000;
+    const divisionsGridHelper = 50;
+    gScene.add( new THREE.GridHelper( sizeGridHelper, divisionsGridHelper ) );
 
     gSceneKeyPoints = new THREE.Scene();
     gSceneKeyPoints.name = "scene_keypoints"
