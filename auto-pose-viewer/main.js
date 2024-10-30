@@ -7,6 +7,10 @@ var gClipActionMixer;
 
 var gScene;
 var gSceneKeyPoints;
+var gScenePrevKeyPoints;
+var gSceneNextKeyPoints;
+const gNumPrevKeyPoints = 10;
+const gNumFutureKeyPoints = 10;
 
 var gDatGUI;
 
@@ -45,11 +49,17 @@ function loadBVH(){
         gMixer = new THREE.AnimationMixer( gSkeletonHelper );
         gClipActionMixer = gMixer.clipAction( bvh.clip );
         gClipActionMixer.loop = THREE.LoopOnce;
+
+        // ref. https://ospace.tistory.com/855
         const objPlay = {play : ()=>{ gClipActionMixer.isScheduled()? gClipActionMixer.reset() : gClipActionMixer.play() } };
         gDatGUI.add(objPlay, 'play');
         gDatGUI.add(gClipActionMixer, 'time', 0, 300, 0.05).listen();
         gDatGUI.add(gClipActionMixer, 'timeScale', 0, 2, 0.05).listen();
         gDatGUI.add(gClipActionMixer, 'clampWhenFinished');
+        const fileFolder = gDatGUI.addFolder("File");
+        const objOpenFile = {Open : () => {}}; // TODO:: redefine function 
+        fileFolder.add(objOpenFile, "Open")
+        fileFolder.open()
         window.action = gClipActionMixer;
         //gMixer.clipAction( bvh.clip ).setEffectiveWeight( 1.0 ).play();
 
@@ -121,10 +131,8 @@ function onWindowResize() {
 }
 
 function animate() {
-
     requestAnimationFrame( animate );
     
-
     gScene.remove(gSceneKeyPoints);
 
     while(gSceneKeyPoints.children.length > 0){ 
@@ -140,7 +148,6 @@ function animate() {
             gBVH.skeleton.bones[i].getWorldPosition(gSpheres[i].position);
         }
     }
-    //console.log(gSpheres[0].position)
 
     gSpheres.forEach((c) => gSceneKeyPoints.add(c));
         
