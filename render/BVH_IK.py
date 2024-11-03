@@ -4,7 +4,7 @@ import OpenGL.GL as gl
 from motion_formats.Common_formats import Rotation
 
 from np import *
-import utils.bvh as bvh
+import core.math as algebra
 from utils.bvh import *
 import motion_formats.BVH_formats as bvh
 
@@ -38,7 +38,7 @@ class BVH_IK:
     def rotate_beta(self, scale):
         gl.glRotatef(self.beta_degree* scale, self.local_beta_axis[0], self.local_beta_axis[1], self.local_beta_axis[2])
     
-    def get_and_set_local_transformation_recursive(self, posture:BVHPosture, ik_target_joint:Joint, joint:Joint) -> None:
+    def get_and_set_local_transformation_recursive(self, posture:Posture, ik_target_joint:Joint, joint:Joint) -> None:
 
         gl.glPushMatrix()
         
@@ -67,7 +67,7 @@ class BVH_IK:
         gl.glPopMatrix()
 
 
-    def get_and_set_transformation_matrix_recursive(self, posture:BVHPosture, ik_target_joint:Joint, joint:Joint) -> None:
+    def get_and_set_transformation_matrix_recursive(self, posture:Posture, ik_target_joint:Joint, joint:Joint) -> None:
 
         gl.glPushMatrix()
         
@@ -94,7 +94,7 @@ class BVH_IK:
 
         gl.glPopMatrix()
 
-    def calculate_ik(self, posture:BVHPosture, ik_target_joint:Joint, desired_position:Optional[np.ndarray]) -> None:
+    def calculate_ik(self, posture:Posture, ik_target_joint:Joint, desired_position:Optional[np.ndarray]) -> None:
         self.get_and_set_transformation_matrix_recursive(posture, ik_target_joint, self.ik_target_skeleton.root)
 
         if desired_position is None:
@@ -136,7 +136,7 @@ class BVH_IK:
         self.global_beta_axis = global_alpha_axis
 
         #calc tau
-        self.tau_degree = np.rad2deg(np.arccos(np.clip(np.dot(bvh.numpy_get_unit(global_pos_c - global_pos_a), bvh.numpy_get_unit(desired_position - global_pos_a)), -1+eps, 1-eps)))
+        self.tau_degree = np.rad2deg(np.arccos(np.clip(np.dot(algebra.numpy_get_unit(global_pos_c - global_pos_a), algebra.numpy_get_unit(desired_position - global_pos_a)), -1+eps, 1-eps)))
         global_tau_axis = np.zeros((4,), dtype=np.float64)
         global_tau_axis[:3] = np.cross(global_pos_c[:3] - global_pos_a[:3], desired_position[:3] - global_pos_a[:3])
         self.global_tau_axis = global_tau_axis

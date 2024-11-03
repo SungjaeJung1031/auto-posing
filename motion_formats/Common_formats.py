@@ -6,7 +6,7 @@ import OpenGL.GL as gl
 
 from np import *
 
-import utils_base as ub
+import core.math.algebra as algebra
 
 class Transformation:
     def __init__(self, name: str, axis: np.ndarray) -> None:
@@ -16,7 +16,7 @@ class Transformation:
             assert axis[-1] == 0
             
         self.name: str = name
-        self.unit_axis: np.ndarray = ub.numpy_get_unit(axis[:3])
+        self.unit_axis: np.ndarray = algebra.numpy_get_unit(axis[:3])
     
     @abstractmethod
     def get_affine_matrix(self, amount: Optional[float]) -> np.ndarray:

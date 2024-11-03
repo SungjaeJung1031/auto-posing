@@ -43,6 +43,11 @@ class GLRenderer:
         self.skeleton: Optional[Skeleton] = None
         self.motion = None
 
+        self.particle_system: Particle_System = Particle_System()
+
+    def update_particle_dynamics(self):
+        self.particle_system.semi_implicit_euler_step(self.particle_update_interval)
+
     def set_object(self, skeleton, motion):
         self.skeleton = skeleton
         self.motion = motion
@@ -71,42 +76,16 @@ class GLRenderer:
     def gl_render_grid(row, col) -> None:
         tmp_Color = gl.glGetFloatv(gl.GL_CURRENT_COLOR)
         gl.glBegin(gl.GL_LINES)   
-        gl.glColor3ub(0,0,0)
+        gl.glColor3ub(255,255,255)
         for i in range(row + 1):
-            gl.glVertex3f(i*2 - row / 2, 0, -col/2)
-            gl.glVertex3f(i*2 - row / 2, 0, col/2)
+            gl.glVertex3f(i - row / 2, 0, -col/2)
+            gl.glVertex3f(i - row / 2, 0, col/2)
         for i in range(col + 1):
-            gl.glVertex3f(-row/2, 0, i*2 - col / 2)
-            gl.glVertex3f(row/2, 0, i*2 - col / 2)
+            gl.glVertex3f(-row/2, 0, i - col / 2)
+            gl.glVertex3f(row/2, 0, i - col / 2)
         gl.glEnd()
 
         gl.glColor4f(tmp_Color[0], tmp_Color[1], tmp_Color[2], tmp_Color[3])
-    
-    @staticmethod
-    def drawCheckerboardGround(grid_size, square_size) -> None:
-        half_grid = grid_size * square_size / 2  # Calculate half the grid size
-
-        for i in range(grid_size):
-            for j in range(grid_size):
-                # Choose color based on position
-                rgb_value_light_gray = (0.827, 0.827, 0.827)
-                rgb_value_gunmetal_gray = (0.208, 0.243, 0.263)
-                rgb_value_blue_gray = (0.416, 0.537, 0.655)
-                color = rgb_value_light_gray if (i + j) % 2 == 0 else rgb_value_blue_gray
-                gl.glColor3fv(color)
-
-                # Calculate the position centered around (0, 0)
-                x = (i * square_size) - half_grid
-                z = (j * square_size) - half_grid
-
-                # Draw a square
-                gl.glPolygonMode(gl.GL_BACK, gl.GL_FILL)
-                gl.glBegin(gl.GL_QUADS)
-                gl.glVertex3f(x, 0.0, z)                   # Bottom left
-                gl.glVertex3f(x + square_size, 0.0, z)   # Bottom right
-                gl.glVertex3f(x + square_size, 0.0, z + square_size)  # Top right
-                gl.glVertex3f(x, 0.0, z + square_size)   # Top left
-                gl.glEnd()
 
     @abstractmethod
     def gl_render(self, frame:int) -> None:

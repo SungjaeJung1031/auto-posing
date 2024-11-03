@@ -3,7 +3,7 @@ from OpenGL.GL import *
 
 from np import *
 
-from utils.bvh import *
+from core.math import *
 
 class GLCamera:
     def __init__(self) -> None:

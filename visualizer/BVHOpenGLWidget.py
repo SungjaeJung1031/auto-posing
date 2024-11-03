@@ -21,7 +21,7 @@ class BVHOpenGLWidget(QOpenGLWidget):
 
     def initializeGL(self) -> None:
         # self.qglClearColor(QtGui.QColor(50, 50, 50)) # initialize the screen to blue
-        gl.glClearColor(1.0, 1.0, 1.0, 1.0) # white
+        gl.glClearColor(0.2, 0.2, 0.2, 1.0)
         # gl.glClear(gl.GL_COLOR_BUFFER_BIT|gl.GL_DEPTH_BUFFER_BIT)
         gl.glEnable(gl.GL_DEPTH_TEST)
         gl.glPolygonMode(gl.GL_FRONT_AND_BACK, gl.GL_LINE)

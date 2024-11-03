@@ -2,7 +2,7 @@ from typing import Dict, List, Tuple
 
 import motion_formats.BVH_formats as bvh
 
-class BVHPosture:
+class Posture:
     def __init__(self, 
                  channels_per_joint: Dict[str, List[bvh.Transformation]], 
                  inputs_per_joint: Dict[str, List[float]]
@@ -24,5 +24,5 @@ class BVHPosture:
         return self.channels_and_transformation_amounts[joint_name].copy()
 
 
-# BVHPosture has dictionary of channel_and_transformation_amount with name of joint as key.
+# Posture has dictionary of channel_and_transformation_amount with name of joint as key.
 # key is name of joint to make Posture can adopted to other skeletons that has same joint-name bindings.

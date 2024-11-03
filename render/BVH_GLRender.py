@@ -17,7 +17,7 @@ class BVH_GLRenderer(GLRenderer):
     def __init__(self) -> None:
         super().__init__()
 
-        self.motion: Optional[BVHMotion]
+        self.motion: Optional[Motion]
         self.ik: Optional[BVH_IK] = BVH_IK(None)
         self.ik_frame_interval = 30
 
@@ -45,10 +45,28 @@ class BVH_GLRenderer(GLRenderer):
         gl.glPolygonMode(gl.GL_FRONT_AND_BACK, gl.GL_LINE)
         self.gl_camera.lookAt()
 
+
+        gl.glPointSize(8)
+        gl.glColor3ub(255, 153, 255)
+        for particle in self.particle_system.particles:
+            print(particle.position[1])
+            gl.glBegin(gl.GL_POINTS)
+            gl.glVertex3f(particle.position[0], particle.position[1], particle.position[2])
+            gl.glEnd()
+            
+        gl.glPointSize(1)
+        gl.glColor3ub(255,255,50)
+        for force in self.particle_system.forces:
+            if force.force_type == ForceType.damped_spring:
+                force: Damped_Spring_Force = force
+                gl.glBegin(gl.GL_LINES)
+                gl.glVertex3f(force.p.position[0], force.p.position[1], force.p.position[2])
+                gl.glVertex3f(force.p2.position[0], force.p2.position[1], force.p2.position[2])
+                gl.glEnd()
+
         if self.render_abs_axis:
             GLRenderer.gl_render_axis(1)
-
-        GLRenderer.drawCheckerboardGround(20, 10.0) # 20x20 grid, square size 1.0
+        GLRenderer.gl_render_grid(30,30)
         if self.motion is not None:
             self.gl_render_bvh_recursive(frame, self.skeleton.root)
             if self.ik_enabled:

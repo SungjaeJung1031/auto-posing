@@ -5,13 +5,13 @@ from typing import Dict, List, Optional, Tuple
 from typing_extensions import override
 
 from customparser import Parser
-from utils.bvh import Joint, Skeleton, BVHPosture, BVHMotion
+from utils.bvh import Joint, Skeleton, Posture, Motion
 import motion_formats.BVH_formats as bvh_formats
 
 class BVHParser(Parser):
     def __init__(self):
         super().__init__()
-        self.parsed_bvh_motion: Optional[BVHMotion] = None
+        self.parsed_bvh_motion: Optional[Motion] = None
         self.parsed_channels_per_joint: Optional[Dict[str, List[bvh_formats.Transformation]]] = None
 
     
@@ -83,9 +83,9 @@ class BVHParser(Parser):
                          name:str, 
                          skeleton: Skeleton, 
                          channels_per_joint: Dict[str, List[bvh_formats.Transformation]]
-                         ) -> BVHMotion:
+                         ) -> Motion:
         
-        bvh_motion = BVHMotion(name, channels_per_joint)
+        bvh_motion = Motion(name, channels_per_joint)
         joint_list: List[Joint] = skeleton.get_joint_list()
         lines = re.split('\\s*\\n+\\s*', content)
 
@@ -107,12 +107,12 @@ class BVHParser(Parser):
                 inputs_per_joint: Dict[str, List[float]] = {}
                 for joint in joint_list:
                     inputs_per_joint[joint.name] = [float(words.pop()) for i in range(len(channels_per_joint[joint.name]))]
-                bvh_motion.append_posture(BVHPosture(channels_per_joint, inputs_per_joint))
+                bvh_motion.append_posture(Posture(channels_per_joint, inputs_per_joint))
         
         return bvh_motion
 
     @override
-    def parse_file(self, filepath: str) -> Tuple[Skeleton, BVHMotion]:
+    def parse_file(self, filepath: str) -> Tuple[Skeleton, Motion]:
         
         self.parsed_file = filepath
         self.changed = False
