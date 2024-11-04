@@ -7,9 +7,12 @@ from core.math import *
 
 class GLCamera:
     def __init__(self) -> None:
+        # update here to adjust the initial camera position
+        # ref. https://stackoverflow.com/questions/5717654/glulookat-explanation
         self.initial_cam = np.identity(4)
         self.initial_cam[:,-1] = 1
         self.initial_cam[-1,2] = 1
+        
         self.viewport_height = 640
         self.viewport_width = 640
         

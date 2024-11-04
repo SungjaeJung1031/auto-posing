@@ -66,8 +66,11 @@ class BVH_GLRenderer(GLRenderer):
 
         if self.render_abs_axis:
             GLRenderer.gl_render_axis(1)
-        GLRenderer.gl_render_grid(30,30)
+
+        GLRenderer.drawCheckerboardGround(50, 30.0) # 50x50 grid, square size 20.0
+        
         if self.motion is not None:
+            self.gl_render_bvh_keypoints(frame, self.skeleton.root)
             self.gl_render_bvh_recursive(frame, self.skeleton.root)
             if self.ik_enabled:
                 tmp_Color = gl.glGetFloatv(gl.GL_CURRENT_COLOR)
@@ -139,15 +142,71 @@ class BVH_GLRenderer(GLRenderer):
         gl.glPopMatrix()
 
 
+
+    def draw_bipyramid(bottom_center, top_center, size):
+        # Calculate vertices
+        b1 = (bottom_center[0] - size, bottom_center[1] - size, bottom_center[2])
+        b2 = (bottom_center[0] + size, bottom_center[1] - size, bottom_center[2])
+        b3 = (bottom_center[0] + size, bottom_center[1] + size, bottom_center[2])
+        b4 = (bottom_center[0] - size, bottom_center[1] + size, bottom_center[2])
+        t1 = (top_center[0], top_center[1], top_center[2] + size)
+
+        vertices = [b1, b2, b3, b4, t1]
+
+        # Draw the base
+        gl.glBegin(gl.GL_QUADS)
+        for vertex in vertices[:4]:
+            gl.glVertex3fv(vertex)
+        gl.glEnd()
+
+        # Draw the sides
+        gl.glBegin(gl.GL_TRIANGLES)
+        for i in range(4):
+            gl.glVertex3fv(vertices[i])
+            gl.glVertex3fv(vertices[(i + 1) % 4])
+            gl.glVertex3fv(t1)
+        gl.glEnd()
+
+
+    def gl_render_bvh_keypoints(self, frame: Optional[int], joint: Joint):
+        gl.glPushMatrix()
+
+        sphere_position = np.array([joint.offsets[0], joint.offsets[1], joint.offsets[2]])
+        gl.glTranslatef(*sphere_position)
+
+        if frame is not None:
+            posture = self.motion.get_posture_at(frame)
+
+            for transformation, amount in posture.get_channels_and_amounts(joint.name):
+                transformation.gl_apply(amount)
+
+        for child in joint.children:
+            self.gl_render_bvh_keypoints(frame, child)
+
+        obj_quad = glu.gluNewQuadric()
+        glu.gluQuadricDrawStyle(obj_quad, glu.GLU_FILL)
+        gl.glPolygonMode(gl.GL_FRONT_AND_BACK, gl.GL_FILL)
+        glu.gluQuadricNormals(obj_quad, glu.GLU_SMOOTH)
+        glu.gluQuadricOrientation(obj_quad, glu.GLU_OUTSIDE)
+        glu.gluQuadricTexture(obj_quad, gl.GL_FALSE)
+        # gl.glEnable(gl.GL_LIGHTING)
+        # gl.glEnable(gl.GL_LIGHT0)
+        # gl.glEnable(gl.GL_COLOR_MATERIAL)
+        gl.glColor3f(1.0, 1.0, 0.0)
+        glu.gluSphere(obj_quad, 3.0, 32, 32)
+
+        gl.glPopMatrix()
+
+
     def gl_render_bvh_recursive(self, frame: Optional[int], joint: Joint):
         gl.glPushMatrix()
         
         if joint.symbol != bvh.Symbol.root:
+            gl.glColor3ub(255,0,255)
             gl.glBegin(gl.GL_LINES)
             gl.glVertex3f(joint.offsets[0], joint.offsets[1], joint.offsets[2])
             gl.glVertex3f(0,0,0)
             gl.glEnd()
-
 
         gl.glTranslatef(joint.offsets[0], joint.offsets[1], joint.offsets[2])
 
