@@ -6,7 +6,7 @@ import threading
 import time
 
 from render import *
-from utils.bvh import *
+from parser.bvh import *
 
 
 import motion_formats.BVH_formats as bvh

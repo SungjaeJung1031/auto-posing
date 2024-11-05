@@ -1,6 +1,6 @@
 from typing import Optional
 
-from utils.bvh import Skeleton
+from parser.bvh import Skeleton
 
 
 class RenderObject:

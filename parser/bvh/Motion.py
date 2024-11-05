@@ -2,7 +2,7 @@ from typing import Dict, List, Optional
 import motion_formats.BVH_formats as bvh
 
 from np import *
-from utils.bvh import Posture
+from parser.bvh import Posture
 
 class Motion:
     def __init__(self, name:str, channels_per_joint: Dict[str, List[bvh.Transformation]]) -> None:

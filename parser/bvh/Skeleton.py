@@ -1,6 +1,6 @@
 from typing import List, Optional
 
-from utils.bvh import Joint
+from parser.bvh import Joint
 
 class Skeleton:
     def __init__(self, name: Optional[str] = None) -> None:

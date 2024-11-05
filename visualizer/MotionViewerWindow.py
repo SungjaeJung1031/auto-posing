@@ -7,8 +7,7 @@ from PySide6.QtWidgets import QCheckBox, QSpinBox, QSlider, QTabWidget, QWidget,
 from PySide6.QtWidgets import QToolButton, QDoubleSpinBox
 
 
-from utils.bvh import *
-from customparser import BVHParser
+from parser.bvh import *
 from visualizer import BVHOpenGLWidget
 from render import *
 from np import *

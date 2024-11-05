@@ -4,11 +4,10 @@ import os
 from typing import Dict, List, Optional, Tuple
 from typing_extensions import override
 
-from customparser import Parser
-from utils.bvh import Joint, Skeleton, Posture, Motion
+from parser.bvh import Joint, Skeleton, Posture, Motion, BVHParserBase
 import motion_formats.BVH_formats as bvh_formats
 
-class BVHParser(Parser):
+class BVHParser(BVHParserBase):
     def __init__(self):
         super().__init__()
         self.parsed_bvh_motion: Optional[Motion] = None

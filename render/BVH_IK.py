@@ -5,7 +5,7 @@ from motion_formats.Common_formats import Rotation
 
 from np import *
 import core.math as algebra
-from utils.bvh import *
+from parser.bvh import *
 import motion_formats.BVH_formats as bvh
 
 class BVH_IK:

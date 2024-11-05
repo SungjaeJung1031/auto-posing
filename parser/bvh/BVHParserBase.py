@@ -1,9 +1,9 @@
 from abc import abstractmethod
 from typing import Optional
 
-from utils.bvh import Joint, Skeleton
+from parser.bvh import Joint, Skeleton
 
-class Parser:
+class BVHParserBase:
     def __init__(self):
         self.parsed_file: Optional[str] = None
         self.changed: bool = False

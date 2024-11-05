@@ -4,7 +4,7 @@ from xmlrpc.client import boolean
 import OpenGL.GL as gl
 from np import *
 
-from utils.bvh import *
+from parser.bvh import *
 from render import *
 
 # class GLRenderObject(RenderObject):
