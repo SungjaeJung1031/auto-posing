@@ -23,7 +23,7 @@ class BVHOpenGLWidget(QOpenGLWidget):
         # self.qglClearColor(QtGui.QColor(50, 50, 50)) # initialize the screen to blue
 
         # set for the background
-        gl.glClearColor(1.0, 1.0, 1.0, 1.0)
+        gl.glClearColor(0.584, 0.596, 0.588, 1.0) # rgb_value_valspar_stone_mason_gray
         # gl.glClear(gl.GL_COLOR_BUFFER_BIT|gl.GL_DEPTH_BUFFER_BIT)
         gl.glEnable(gl.GL_DEPTH_TEST)
         gl.glPolygonMode(gl.GL_FRONT_AND_BACK, gl.GL_LINE)

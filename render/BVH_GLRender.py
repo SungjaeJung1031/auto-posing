@@ -70,8 +70,10 @@ class BVH_GLRenderer(GLRenderer):
         GLRenderer.drawCheckerboardGround(50, 30.0) # 50x50 grid, square size 20.0
         
         if self.motion is not None:
+            # self.draw_bipyramid([10,10,10], [20,20,20], 1)
+            # self.draw_bipyramid([10,10,10], [0,0,0], 2)
             self.gl_render_bvh_keypoints(frame, self.skeleton.root)
-            self.gl_render_bvh_recursive(frame, self.skeleton.root)
+            self.gl_render_bvh_skeleton_recursive(frame, self.skeleton.root)
             if self.ik_enabled:
                 tmp_Color = gl.glGetFloatv(gl.GL_CURRENT_COLOR)
                 gl.glColor3ub(255,0,0)
@@ -141,31 +143,67 @@ class BVH_GLRenderer(GLRenderer):
 
         gl.glPopMatrix()
 
+    def draw_pyramid(self, apex, base_center):
+        ax, ay, az = apex
+        bx, by, bz = base_center
 
+        # Side length of the square base
+        side_length = 2.0
 
-    def draw_bipyramid(bottom_center, top_center, size):
-        # Calculate vertices
-        b1 = (bottom_center[0] - size, bottom_center[1] - size, bottom_center[2])
-        b2 = (bottom_center[0] + size, bottom_center[1] - size, bottom_center[2])
-        b3 = (bottom_center[0] + size, bottom_center[1] + size, bottom_center[2])
-        b4 = (bottom_center[0] - size, bottom_center[1] + size, bottom_center[2])
-        t1 = (top_center[0], top_center[1], top_center[2] + size)
-
-        vertices = [b1, b2, b3, b4, t1]
-
-        # Draw the base
-        gl.glBegin(gl.GL_QUADS)
-        for vertex in vertices[:4]:
-            gl.glVertex3fv(vertex)
-        gl.glEnd()
-
-        # Draw the sides
+        # Calculate the 4 corners of the base
+        half_side = side_length / 2
+        base_vertices = [
+            (bx - half_side, by, bz - half_side),
+            (bx + half_side, by, bz - half_side),
+            (bx + half_side, by, bz + half_side),
+            (bx - half_side, by, bz + half_side),
+        ]
+        
         gl.glBegin(gl.GL_TRIANGLES)
+
+        # Draw the 4 faces of the pyramid
         for i in range(4):
-            gl.glVertex3fv(vertices[i])
-            gl.glVertex3fv(vertices[(i + 1) % 4])
-            gl.glVertex3fv(t1)
+            # Get the base corner vertices
+            v1 = base_vertices[i]
+            v2 = base_vertices[(i + 1) % 4]  # Next vertex in the base
+            # Draw the triangle with the apex
+            gl.glVertex3f(ax, ay, az)  # Apex
+            gl.glVertex3f(v1[0], v1[1], v1[2])  # First base corner
+            gl.glVertex3f(v2[0], v2[1], v2[2])  # Second base corner
+
         gl.glEnd()
+
+        # Optionally, draw the base as a square (using GL_QUADS)
+        gl.glBegin(gl.GL_QUADS)
+        for i in range(4):
+            gl.glVertex3f(base_vertices[i][0], base_vertices[i][1], base_vertices[i][2])
+        gl.glEnd()
+
+
+
+    # def draw_bipyramid(self, bottom_center, top_center, size):
+    #     # Calculate vertices
+    #     b1 = (bottom_center[0] - size, bottom_center[1] - size, bottom_center[2])
+    #     b2 = (bottom_center[0] + size, bottom_center[1] - size, bottom_center[2])
+    #     b3 = (bottom_center[0] + size, bottom_center[1] + size, bottom_center[2])
+    #     b4 = (bottom_center[0] - size, bottom_center[1] + size, bottom_center[2])
+    #     t1 = (top_center[0], top_center[1], top_center[2] + size)
+
+    #     vertices = [b1, b2, b3, b4, t1]
+
+    #     # Draw the base
+    #     gl.glBegin(gl.GL_QUADS)
+    #     for vertex in vertices[:4]:
+    #         gl.glVertex3fv(vertex)
+    #     gl.glEnd()
+
+    #     # Draw the sides
+    #     gl.glBegin(gl.GL_TRIANGLES)
+    #     for i in range(4):
+    #         gl.glVertex3fv(vertices[i])
+    #         gl.glVertex3fv(vertices[(i + 1) % 4])
+    #         gl.glVertex3fv(t1)
+    #     gl.glEnd()
 
 
     def gl_render_bvh_keypoints(self, frame: Optional[int], joint: Joint):
@@ -193,20 +231,16 @@ class BVH_GLRenderer(GLRenderer):
         # gl.glEnable(gl.GL_LIGHT0)
         # gl.glEnable(gl.GL_COLOR_MATERIAL)
         gl.glColor3f(1.0, 1.0, 0.0)
-        glu.gluSphere(obj_quad, 3.0, 32, 32)
+        glu.gluSphere(obj_quad, 1.0, 32, 32)
 
         gl.glPopMatrix()
 
 
-    def gl_render_bvh_recursive(self, frame: Optional[int], joint: Joint):
-        gl.glPushMatrix()
-        
+    def gl_render_bvh_skeleton_recursive(self, frame: Optional[int], joint: Joint):
         if joint.symbol != bvh.Symbol.root:
-            gl.glColor3ub(255,0,255)
-            gl.glBegin(gl.GL_LINES)
-            gl.glVertex3f(joint.offsets[0], joint.offsets[1], joint.offsets[2])
-            gl.glVertex3f(0,0,0)
-            gl.glEnd()
+            gl.glPushMatrix()
+            gl.glColor3ub(0,255,0)
+            self.draw_pyramid((joint.offsets[0], joint.offsets[1], joint.offsets[2]), (0,0,0))
 
         gl.glTranslatef(joint.offsets[0], joint.offsets[1], joint.offsets[2])
 
@@ -240,7 +274,7 @@ class BVH_GLRenderer(GLRenderer):
             GLRenderer.gl_render_axis(1/10)
 
         for child in joint.children:
-            self.gl_render_bvh_recursive(frame, child)
+            self.gl_render_bvh_skeleton_recursive(frame, child)
 
         gl.glPopMatrix()
 
