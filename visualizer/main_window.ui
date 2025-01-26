@@ -102,13 +102,20 @@
                <enum>Qt::NoFocus</enum>
               </property>
               <property name="currentIndex">
-               <number>2</number>
+               <number>0</number>
               </property>
               <widget class="QWidget" name="tab_view">
                <attribute name="title">
                 <string>View</string>
                </attribute>
                <layout class="QFormLayout" name="formLayout_view">
+                <item row="0" column="0">
+                 <widget class="QLabel" name="label_view_ortho">
+                  <property name="text">
+                   <string>Orthogonal</string>
+                  </property>
+                 </widget>
+                </item>
                 <item row="0" column="1">
                  <widget class="QCheckBox" name="checkBox_view_ortho">
                   <property name="sizePolicy">
@@ -122,13 +129,6 @@
                   </property>
                   <property name="text">
                    <string/>
-                  </property>
-                 </widget>
-                </item>
-                <item row="0" column="0">
-                 <widget class="QLabel" name="label_view_ortho">
-                  <property name="text">
-                   <string>Orthogonal</string>
                   </property>
                  </widget>
                 </item>
@@ -275,6 +275,40 @@
                    </widget>
                   </item>
                  </layout>
+                </item>
+                <item row="4" column="0">
+                 <widget class="QLabel" name="label">
+                  <property name="text">
+                   <string>Visible Frames</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="4" column="1">
+                 <widget class="QDoubleSpinBox" name="doubleSpinBox">
+                  <property name="decimals">
+                   <number>0</number>
+                  </property>
+                  <property name="minimum">
+                   <double>1.000000000000000</double>
+                  </property>
+                  <property name="stepType">
+                   <enum>QAbstractSpinBox::DefaultStepType</enum>
+                  </property>
+                 </widget>
+                </item>
+                <item row="5" column="0">
+                 <widget class="QLabel" name="label_2">
+                  <property name="text">
+                   <string>Show Path</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="5" column="1">
+                 <widget class="QCheckBox" name="checkBox">
+                  <property name="text">
+                   <string/>
+                  </property>
+                 </widget>
                 </item>
                </layout>
               </widget>
