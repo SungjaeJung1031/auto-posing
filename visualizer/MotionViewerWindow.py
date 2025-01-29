@@ -32,12 +32,19 @@ class MotionViewerWindow(QMainWindow):
         self.spinBox_ik_target_frame: QSpinBox
 
         self.tab_view: QWidget
+        # View
         self.pushButton_view_at_x: QPushButton
         self.pushButton_view_at_y: QPushButton
         self.pushButton_view_at_z: QPushButton
         self.checkBox_view_abs_axis: QCheckBox
         self.checkBox_view_joint_axis: QCheckBox
         self.checkBox_view_ortho: QCheckBox
+        self.checkBox_view_forward_frames: QCheckBox
+        self.checkBox_view_path: QPushButton
+
+        # ML
+        self.pushButton_ml_skel_between: QPushButton
+        self.checkBox_ml_show_skel_between: QCheckBox
 
         self.treeWidget: QTreeWidget
         self.menubar: QMenuBar
@@ -113,6 +120,8 @@ class MotionViewerWindow(QMainWindow):
                 self.openGLWidget.frame = 0
 
     def _update_glwidget(self):
+        self.openGLWidget.UpdateFowardFramesVisibility(self.checkBox_view_forward_frames.isChecked())
+        self.openGLWidget.UpdateSkelBetweenVisibility(self.checkBox_ml_show_skel_between.isChecked())
         self.openGLWidget.update()
         self.spinBox_frame.setValue(self.openGLWidget.frame if self.openGLWidget.frame is not None else 0)
 
@@ -153,6 +162,9 @@ class MotionViewerWindow(QMainWindow):
     def _view_at_z(self):
         self.gl_renderer.gl_camera.view_target_at(0, 0)
         # self.openGLWidget.update()
+    
+    def _skel_between(self):
+        self.gl_renderer.SKEL_BETWEEN()
 
     def _abs_axis(self):
         if self.checkBox_view_abs_axis.isChecked():
@@ -378,6 +390,7 @@ class MotionViewerWindow(QMainWindow):
         self.pushButton_view_at_x.clicked.connect(self._view_at_x)
         self.pushButton_view_at_y.clicked.connect(self._view_at_y)
         self.pushButton_view_at_z.clicked.connect(self._view_at_z)
+        self.pushButton_ml_skel_between.clicked.connect(self._skel_between)
 
         self.slider_frame.valueChanged.connect(self._slider_frame)
         self.spinBox_frame.textChanged.connect(self._spinbox_frame)

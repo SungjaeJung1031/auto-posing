@@ -24,8 +24,8 @@
     <rect>
      <x>10</x>
      <y>30</y>
-     <width>1090</width>
-     <height>804</height>
+     <width>1088</width>
+     <height>921</height>
     </rect>
    </property>
    <property name="layoutDirection">
@@ -35,7 +35,7 @@
     <item>
      <widget class="QWidget" name="widget" native="true">
       <layout class="QFormLayout" name="formLayout_11">
-       <item row="0" column="0" colspan="2">
+       <item row="0" column="0">
         <widget class="QSplitter" name="splitter">
          <property name="lineWidth">
           <number>1</number>
@@ -102,7 +102,7 @@
                <enum>Qt::NoFocus</enum>
               </property>
               <property name="currentIndex">
-               <number>0</number>
+               <number>3</number>
               </property>
               <widget class="QWidget" name="tab_view">
                <attribute name="title">
@@ -277,34 +277,28 @@
                  </layout>
                 </item>
                 <item row="4" column="0">
-                 <widget class="QLabel" name="label">
+                 <widget class="QLabel" name="label_view_forward_frames">
                   <property name="text">
-                   <string>Visible Frames</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="4" column="1">
-                 <widget class="QDoubleSpinBox" name="doubleSpinBox">
-                  <property name="decimals">
-                   <number>0</number>
-                  </property>
-                  <property name="minimum">
-                   <double>1.000000000000000</double>
-                  </property>
-                  <property name="stepType">
-                   <enum>QAbstractSpinBox::DefaultStepType</enum>
+                   <string>Show Forward Frames</string>
                   </property>
                  </widget>
                 </item>
                 <item row="5" column="0">
-                 <widget class="QLabel" name="label_2">
+                 <widget class="QLabel" name="label_view_path">
                   <property name="text">
                    <string>Show Path</string>
                   </property>
                  </widget>
                 </item>
                 <item row="5" column="1">
-                 <widget class="QCheckBox" name="checkBox">
+                 <widget class="QCheckBox" name="checkBox_view_path">
+                  <property name="text">
+                   <string/>
+                  </property>
+                 </widget>
+                </item>
+                <item row="4" column="1">
+                 <widget class="QCheckBox" name="checkBox_view_forward_frames">
                   <property name="text">
                    <string/>
                   </property>
@@ -1846,6 +1840,41 @@
                     </item>
                    </layout>
                   </widget>
+                 </widget>
+                </item>
+               </layout>
+              </widget>
+              <widget class="QWidget" name="tab_ml">
+               <attribute name="title">
+                <string>ML</string>
+               </attribute>
+               <layout class="QFormLayout" name="formLayout_7">
+                <item row="0" column="0">
+                 <widget class="QLabel" name="label_ml_skel_between">
+                  <property name="text">
+                   <string>SKEL_BTW</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="1">
+                 <widget class="QPushButton" name="pushButton_ml_skel_between">
+                  <property name="text">
+                   <string>Generate</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="0">
+                 <widget class="QLabel" name="label_ml_show_skel_between">
+                  <property name="text">
+                   <string>Show SKEL_BTW</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="1">
+                 <widget class="QCheckBox" name="checkBox_ml_show_skel_between">
+                  <property name="text">
+                   <string/>
+                  </property>
                  </widget>
                 </item>
                </layout>

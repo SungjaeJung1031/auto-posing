@@ -14,6 +14,8 @@ class BVHOpenGLWidget(QOpenGLWidget):
         super().__init__(parent)
         self.gl_renderer: GLRenderer
         self.frame: Optional[int] = None
+        self.show_forward_frames: bool = False
+        self.show_skel_between: bool = False
         self.enable_orbit: bool = False
         self.enable_panning: bool = False
         self.mouse_pose_x = None
@@ -29,7 +31,7 @@ class BVHOpenGLWidget(QOpenGLWidget):
         gl.glPolygonMode(gl.GL_FRONT_AND_BACK, gl.GL_LINE)
 
     def paintGL(self) -> None:
-        self.gl_renderer.gl_render(self.frame)
+        self.gl_renderer.gl_render(self.frame, self.show_forward_frames, self.show_skel_between)
         
     def resizeGL(self, w: int, h: int) -> None:
         if sys.platform == 'linux':
@@ -80,7 +82,11 @@ class BVHOpenGLWidget(QOpenGLWidget):
         self.gl_renderer.gl_camera.zoomming(event.angleDelta().y()* 0.01)
         self.update()
 
-
+    def UpdateSkelBetweenVisibility(self, show_skel_between: bool) -> None:
+        self.show_skel_between = show_skel_between
+    
+    def UpdateFowardFramesVisibility(self, show_forward_frames: bool) -> None:
+        self.show_forward_frames = show_forward_frames
 
 
 
