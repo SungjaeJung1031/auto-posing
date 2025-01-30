@@ -173,11 +173,12 @@ class BVH_GLRenderer(GLRenderer):
 
         gl.glEnd()
 
-        # Optionally, draw the base as a square (using GL_QUADS)
-        gl.glBegin(gl.GL_QUADS)
-        for i in range(4):
-            gl.glVertex3f(base_vertices[i][0], base_vertices[i][1], base_vertices[i][2])
-        gl.glEnd()
+        ## TODO:: fix to draw base as a square
+        # # Optionally, draw the base as a square (using GL_QUADS)
+        # gl.glBegin(gl.GL_QUADS)
+        # for i in range(4):
+        #     gl.glVertex3f(base_vertices[i][0], base_vertices[i][1], base_vertices[i][2])
+        # gl.glEnd()
 
 
 
@@ -237,8 +238,9 @@ class BVH_GLRenderer(GLRenderer):
 
 
     def gl_render_bvh_skeleton_recursive(self, frame: Optional[int], joint: Joint):
+        gl.glPushMatrix()
+
         if joint.symbol != bvh.Symbol.root:
-            gl.glPushMatrix()
             gl.glColor3ub(0,255,0)
             self.draw_pyramid((joint.offsets[0], joint.offsets[1], joint.offsets[2]), (0,0,0))
 
