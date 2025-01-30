@@ -38,7 +38,8 @@ class BVH_GLRenderer(GLRenderer):
 
     @override
     def gl_render(self, frame: Optional[int]) -> None:
-
+    def gl_render(self, frame: Optional[int], visible_forward_frames: bool, visible_skel_between: bool) -> None:
+        
         gl.glClear(gl.GL_COLOR_BUFFER_BIT | gl.GL_DEPTH_BUFFER_BIT)
         gl.glClear(gl.GL_COLOR_BUFFER_BIT|gl.GL_DEPTH_BUFFER_BIT)
         gl.glEnable(gl.GL_DEPTH_TEST)
@@ -69,28 +70,62 @@ class BVH_GLRenderer(GLRenderer):
 
         GLRenderer.drawCheckerboardGround(50, 30.0) # 50x50 grid, square size 20.0
         
+        # return when frame is None
+        if frame == None:
+            return
+
         if self.motion is not None:
             # self.draw_bipyramid([10,10,10], [20,20,20], 1)
             # self.draw_bipyramid([10,10,10], [0,0,0], 2)
-            self.gl_render_bvh_keypoints(frame, self.skeleton.root)
-            self.gl_render_bvh_skeleton_recursive(frame, self.skeleton.root)
-            if self.ik_enabled:
-                tmp_Color = gl.glGetFloatv(gl.GL_CURRENT_COLOR)
-                gl.glColor3ub(255,0,0)
-                self.gl_render_ik_target_bvh(self.ik_frame, self.skeleton.root)
-                # gl.glColor4f(tmp_Color[0], tmp_Color[1], tmp_Color[2], tmp_Color[3])
+            #### TODO:: add options to draw post event skeleton
+            ### 1. check the new option "visible frame"
+            ### 2. if the "visible frame" > 1 
+            ### 3.1. if true,   check if the frame is smaller than max 
+            ### 3.2.            draw next frames
+            ### 4.1. if false,  draw only current frame 
+            cur_frame = frame
+            visible_foward_frames_upper_bound :int
+            if visible_forward_frames == True:
+                visible_foward_frames_upper_bound = frame + 30
+            else:
+                visible_foward_frames_upper_bound = frame + 1
 
-                if self.ik_desired_position is not None:
-                    tmp_point_size = gl.glGetFloat(gl.GL_POINT_SIZE)
-                    gl.glColor3ub(0, 0, 255)
-                    gl.glPointSize(8)
-                    gl.glPushMatrix()
-                    gl.glBegin(gl.GL_POINTS)
-                    gl.glVertex3f(self.ik_desired_position[0],self.ik_desired_position[1],self.ik_desired_position[2])
-                    gl.glEnd()
-                    gl.glPopMatrix()
-                    gl.glPointSize(tmp_point_size)
-                gl.glColor4f(tmp_Color[0], tmp_Color[1], tmp_Color[2], tmp_Color[3])
+            target_frame_keypoints_color = [1.0, 1.0, 0.0, 1.0]
+            visible_foward_frames_keypoints_color = [1.0, 1.0, 0.0, 0.1]
+            target_frame_skeleton_color = [0.0, 1.0, 0.0, 1.0]
+            visible_foward_frames_skeleton_color = [0.0, 1.0, 0.0, 0.1]
+
+            for i in range(cur_frame, visible_foward_frames_upper_bound):
+                if frame > self.motion.get_max_frame():
+                    break
+
+                keypoints_color: list
+                if i == frame:
+                    keypoints_color = target_frame_keypoints_color
+                    skeleton_color = target_frame_skeleton_color
+                else:
+                    keypoints_color = visible_foward_frames_keypoints_color
+                    skeleton_color = visible_foward_frames_skeleton_color
+
+                self.gl_render_bvh_keypoints(i, self.skeleton.root, keypoints_color)
+                self.gl_render_bvh_skeleton_recursive(i, self.skeleton.root, skeleton_color)
+                if self.ik_enabled:
+                    tmp_Color = gl.glGetFloatv(gl.GL_CURRENT_COLOR)
+                    gl.glColor3ub(255,0,0)
+                    self.gl_render_ik_target_bvh(self.ik_frame, self.skeleton.root)
+                    # gl.glColor4f(tmp_Color[0], tmp_Color[1], tmp_Color[2], tmp_Color[3])
+
+                    if self.ik_desired_position is not None:
+                        tmp_point_size = gl.glGetFloat(gl.GL_POINT_SIZE)
+                        gl.glColor3ub(0, 0, 255)
+                        gl.glPointSize(8)
+                        gl.glPushMatrix()
+                        gl.glBegin(gl.GL_POINTS)
+                        gl.glVertex3f(self.ik_desired_position[0],self.ik_desired_position[1],self.ik_desired_position[2])
+                        gl.glEnd()
+                        gl.glPopMatrix()
+                        gl.glPointSize(tmp_point_size)
+                    gl.glColor4f(tmp_Color[0], tmp_Color[1], tmp_Color[2], tmp_Color[3])
 
 
 
@@ -207,7 +242,7 @@ class BVH_GLRenderer(GLRenderer):
     #     gl.glEnd()
 
 
-    def gl_render_bvh_keypoints(self, frame: Optional[int], joint: Joint):
+    def gl_render_bvh_keypoints(self, frame: Optional[int], joint: Joint, keypoints_color: list):
         gl.glPushMatrix()
 
         sphere_position = np.array([joint.offsets[0], joint.offsets[1], joint.offsets[2]])
@@ -220,7 +255,7 @@ class BVH_GLRenderer(GLRenderer):
                 transformation.gl_apply(amount)
 
         for child in joint.children:
-            self.gl_render_bvh_keypoints(frame, child)
+            self.gl_render_bvh_keypoints(frame, child, keypoints_color)
 
         obj_quad = glu.gluNewQuadric()
         glu.gluQuadricDrawStyle(obj_quad, glu.GLU_FILL)
@@ -231,17 +266,18 @@ class BVH_GLRenderer(GLRenderer):
         # gl.glEnable(gl.GL_LIGHTING)
         # gl.glEnable(gl.GL_LIGHT0)
         # gl.glEnable(gl.GL_COLOR_MATERIAL)
-        gl.glColor3f(1.0, 1.0, 0.0)
+        gl.glColor4f(keypoints_color[0], keypoints_color[1], keypoints_color[2], keypoints_color[3])
         glu.gluSphere(obj_quad, 1.0, 32, 32)
 
+        # print("joint: {}, position: {}".format(joint.name, ))
         gl.glPopMatrix()
 
 
-    def gl_render_bvh_skeleton_recursive(self, frame: Optional[int], joint: Joint):
+    def gl_render_bvh_skeleton_recursive(self, frame: Optional[int], joint: Joint, skeleton_color: list):
         gl.glPushMatrix()
 
         if joint.symbol != bvh.Symbol.root:
-            gl.glColor3ub(0,255,0)
+            gl.glColor4f(skeleton_color[0], skeleton_color[1], skeleton_color[2], skeleton_color[3])
             self.draw_pyramid((joint.offsets[0], joint.offsets[1], joint.offsets[2]), (0,0,0))
 
         gl.glTranslatef(joint.offsets[0], joint.offsets[1], joint.offsets[2])
@@ -276,7 +312,7 @@ class BVH_GLRenderer(GLRenderer):
             GLRenderer.gl_render_axis(1/10)
 
         for child in joint.children:
-            self.gl_render_bvh_skeleton_recursive(frame, child)
+            self.gl_render_bvh_skeleton_recursive(frame, child, skeleton_color)
 
         gl.glPopMatrix()
 
