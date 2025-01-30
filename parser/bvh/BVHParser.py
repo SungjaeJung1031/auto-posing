@@ -62,6 +62,10 @@ class BVHParser(BVHParserBase):
                 print("|", current_joint.parent_depth * "  |", "-", joint_name, sep='')
 
             elif symbol == bvh_formats.Symbol.offset:
+                # for visualizing the Yposition offset of the ROOT joint need to be 0.0 in thie visualizer
+                if current_joint.symbol == bvh_formats.Symbol.root:
+                    words[2] = 0.0
+
                 current_joint.offsets.extend(map(float, words[1:]))
 
             elif symbol == bvh_formats.Symbol.channels:
